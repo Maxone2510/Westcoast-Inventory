@@ -684,8 +684,8 @@ function App(){
     try{
       const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(file);});
       let c=[];
-      if(file.type.startsWith("image/"))c=[{type:"image",source:{type:"base64",media_type:file.type,data:b64}},{type:"text",text:`Analyze this BOL. Return ONLY JSON: {"items":[{"name":"...","qty":0,"unit":"..."}],"bolNumber":"...","date":"..."}`}];
-      else if(file.type==="application/pdf")c=[{type:"document",source:{type:"base64",media_type:"application/pdf",data:b64}},{type:"text",text:`Analyze this BOL. Return ONLY JSON: {"items":[{"name":"...","qty":0,"unit":"..."}],"bolNumber":"...","date":"..."}`}];
+      if(file.type.startsWith("image/"))c=[{type:"image",source:{type:"base64",media_type:file.type,data:b64}},{type:"text",text:`Analyze this document — it may be a BOL, invoice, packing slip, or delivery receipt. Extract whatever receiving info is available. Return ONLY valid JSON: {"items":[{"name":"...","qty":0,"unit":"..."}],"bolNumber":"...","invoiceNumber":"...","date":"...","supplier":"..."}`}];
+      else if(file.type==="application/pdf")c=[{type:"document",source:{type:"base64",media_type:"application/pdf",data:b64}},{type:"text",text:`Analyze this document — it may be a BOL, invoice, packing slip, or delivery receipt. Extract whatever receiving info is available. Return ONLY valid JSON: {"items":[{"name":"...","qty":0,"unit":"..."}],"bolNumber":"...","invoiceNumber":"...","date":"...","supplier":"..."}`}];
       if(c.length){
         const rsp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:c}]})});
         const data=await rsp.json();
@@ -702,7 +702,7 @@ function App(){
     try{
       const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(file);});
       let c=[];
-      const prompt=`Analyze this Bill of Lading for Westcoast Vegetables Ltd., a pepper packaging facility in Delta BC.
+      const prompt=`Analyze this document for Westcoast Vegetables Ltd. in Delta BC. It may be a BOL, invoice, packing slip, or delivery receipt — process it regardless of format.
 Extract ALL items. Product codes 28580001=WS 11LB, 14160085=Tall Generic, 14160066=Maestro are key.
 Return ONLY valid JSON: {"bolNumber":"...","date":"...","supplier":"...","items":[{"name":"...","qty":0,"unit":"...","productCode":"..."}]}`;
       if(file.type.startsWith("image/"))c=[{type:"image",source:{type:"base64",media_type:file.type,data:b64}},{type:"text",text:prompt}];
